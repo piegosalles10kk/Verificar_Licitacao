@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Análise de Licitações | Business Intelligence</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    Sistema de Análise de Licitações
+                </h1>
+                <div class="header-subtitle">Business Intelligence & Analytics</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Filtros de Busca -->
+            <section class="search-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Parâmetros de Consulta</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="searchForm" class="search-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="orgaoInput">Órgão / Instituição:</label>
+                                    <input 
+                                        type="text" 
+                                        id="orgaoInput" 
+                                        placeholder="Ex: EXERCITO, EMBRAPA, ANVISA"
+                                        required
+                                    >
+                                    <small>Digite o nome do órgão ou instituição</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="objetoInput">Objeto da Licitação:</label>
+                                    <input 
+                                        type="text" 
+                                        id="objetoInput" 
+                                        placeholder="Ex: ESCRITORIO, COMPUTADOR, SERVIÇOS"
+                                        required
+                                    >
+                                    <small>Digite palavras-chave do objeto</small>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="searchBtn">
+                                Executar Análise
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading -->
+            <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+                <p id="loadingMessage">Processando análise de dados...</p>
+                <p id="loadingSubMessage" class="loading-submessage"></p>
+            </div>
+
+            <!-- Results Container -->
+            <div id="resultsContainer" style="display: none;">
+                
+                <!-- KPIs Section -->
+                <section class="kpi-section">
+                    <h2 class="section-title">Indicadores-Chave de Performance (KPIs)</h2>
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon">📋</div>
+                            <div class="kpi-value" id="kpiTotal">-</div>
+                            <div class="kpi-label">Total de Licitações</div>
+                        </div>
+                        <div class="kpi-card success">
+                            <div class="kpi-icon">✅</div>
+                            <div class="kpi-value" id="kpiAprovadas">-</div>
+                            <div class="kpi-label">Licitações Aprovadas</div>
+                        </div>
+                        <div class="kpi-card info">
+                            <div class="kpi-icon">📈</div>
+                            <div class="kpi-value" id="kpiTaxa">-</div>
+                            <div class="kpi-label">Taxa de Sucesso</div>
+                        </div>
+                        <div class="kpi-card warning">
+                            <div class="kpi-icon">💰</div>
+                            <div class="kpi-value" id="kpiValor">-</div>
+                            <div class="kpi-label">Valor Total (R$)</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section class="charts-section">
+                    <div class="charts-grid">
+                        
+                        <!-- Chart 1: Taxa de Aprovação -->
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <h3>Taxa de Aprovação</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="approvalChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 2: Distribuição Geográfica -->
+                        <div class="card chart-card">
+                            <div class="card-header">
+                                <h3>Distribuição por Município - Aprovações</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="locationChart"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- Relatório Gerencial -->
+                <section class="report-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Relatório Gerencial - Análise Estratégica</h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="reportContent" class="report-content">
+                                <!-- Conteúdo será preenchido via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tabela de Todas as Licitações -->
+                <section class="sample-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Todas as Licitações Encontradas (<span id="totalLicitacoesCount">0</span>)</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- Filtros e Busca -->
+                            <div class="table-filters">
+                                <div class="filter-row">
+                                    <div class="search-box">
+                                        <input 
+                                            type="text" 
+                                            id="tableSearch" 
+                                            placeholder="🔍 Buscar em todas as colunas..."
+                                        >
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="municipioFilter">Município:</label>
+                                        <select id="municipioFilter">
+                                            <option value="">Todos os Municípios</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="ordenacaoFilter">Ordenar por:</label>
+                                        <select id="ordenacaoFilter">
+                                            <option value="status">Status (Aprovadas primeiro)</option>
+                                            <option value="valor-desc">Maior Valor</option>
+                                            <option value="valor-asc">Menor Valor</option>
+                                            <option value="municipio">Município (A-Z)</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-secondary" id="clearFiltersBtn">
+                                        Limpar Filtros
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table id="sampleTable" class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Órgão</th>
+                                            <th>Objeto</th>
+                                            <th>Situação</th>
+                                            <th>Município</th>
+                                            <th>Valor (R$)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sampleTableBody">
+                                        <!-- Linhas serão preenchidas via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div id="noResultsMessage" class="no-results" style="display: none;">
+                                <p>Nenhuma licitação encontrada com os filtros aplicados.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Sistema de Análise de Licitações | Business Intelligence</p>
+            <p class="footer-note">Dados provenientes de fontes governamentais oficiais</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

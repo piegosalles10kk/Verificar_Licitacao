@@ -93,7 +93,7 @@ function calcularMetricas(licitacoesFiltradas) {
     const contagemMunicipios = {};
 
     // Situações que indicam sucesso/homologação (mesmo termos parciais)
-    const STATUS_APROVADO = ['HOMOLOGADO', 'CONTRATADO', 'ADJUDICADO', 'EVENTO DE RESULTADO']; 
+    const STATUS_APROVADO = ['HOMOLOGADO', 'CONTRATADO', 'ADJUDICADO', 'EVENTO DE RESULTADO', 'ENCERRADO']; 
 
     // Situações que indicam Fracasso/Insucesso EXPLICITAMENTE (usaremos para exclusão)
     const STATUS_FALHA = ['CANCELADO', 'FRACASSADO', 'SUSPENSA', 'DESERTA'];
